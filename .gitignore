@@ -12,3 +12,9 @@
 hs_err_pid*
 
 VetClinics/nbproject
+/nbproject/private/
+/build/
+~.swp
+build.xml
+nbbuild.xml
+nbproject/
