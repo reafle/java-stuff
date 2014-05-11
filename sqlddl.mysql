@@ -1,0 +1,102 @@
+SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
+
+CREATE SCHEMA IF NOT EXISTS `mydb` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci ;
+USE `mydb` ;
+
+-- -----------------------------------------------------
+-- Table `mydb`.`Types`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`Types` (
+  `idTypes` INT NOT NULL,
+  `type_name` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`idTypes`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`Record`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`Record` (
+  `idRecord` INT NOT NULL,
+  `Comments` VARCHAR(45) NULL,
+  `visit_date` DATE NOT NULL,
+  PRIMARY KEY (`idRecord`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`Animal`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`Animal` (
+  `idAnimal` INT NOT NULL,
+  `Name` VARCHAR(45) NOT NULL,
+  `Breed` VARCHAR(45) NOT NULL,
+  `Gender` VARCHAR(45) NOT NULL,
+  `Birth_date` DATE NOT NULL,
+  `Color` VARCHAR(45) NOT NULL,
+  `Types_idTypes` INT NOT NULL,
+  `Record_idRecord` INT NOT NULL,
+  `Record_id_number` DECIMAL(10,0) NOT NULL,
+  PRIMARY KEY (`idAnimal`, `Record_idRecord`, `Record_id_number`),
+  UNIQUE INDEX `idDog_UNIQUE` (`idAnimal` ASC),
+  INDEX `fk_Animal_Types_idx` (`Types_idTypes` ASC),
+  INDEX `fk_Animal_Record1_idx` (`Record_idRecord` ASC, `Record_id_number` ASC),
+  CONSTRAINT `fk_Animal_Types`
+    FOREIGN KEY (`Types_idTypes`)
+    REFERENCES `mydb`.`Types` (`idTypes`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Animal_Record1`
+    FOREIGN KEY (`Record_idRecord`)
+    REFERENCES `mydb`.`Record` (`idRecord`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = ndbcluster
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`Owner`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`Owner` (
+  `idOwner` INT NOT NULL,
+  `Name` VARCHAR(45) NOT NULL,
+  `Surname` VARCHAR(45) NOT NULL,
+  `email` VARCHAR(45) NULL,
+  `phone_number` DECIMAL(10,0) NOT NULL,
+  PRIMARY KEY (`idOwner`),
+  UNIQUE INDEX `idOwner_UNIQUE` (`idOwner` ASC))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`Owner_has_Animal`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`Owner_has_Animal` (
+  `Owner_idOwner` INT NOT NULL,
+  `Animal_idAnimal` INT NOT NULL,
+  PRIMARY KEY (`Owner_idOwner`, `Animal_idAnimal`),
+  INDEX `fk_Owner_has_Animal_Animal1_idx` (`Animal_idAnimal` ASC),
+  INDEX `fk_Owner_has_Animal_Owner1_idx` (`Owner_idOwner` ASC),
+  CONSTRAINT `fk_Owner_has_Animal_Owner1`
+    FOREIGN KEY (`Owner_idOwner`)
+    REFERENCES `mydb`.`Owner` (`idOwner`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Owner_has_Animal_Animal1`
+    FOREIGN KEY (`Animal_idAnimal`)
+    REFERENCES `mydb`.`Animal` (`idAnimal`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
